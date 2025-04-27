@@ -1,6 +1,11 @@
+# The production bayshore docker compose file is totally different from this one
+# this one it should work for the most part for a generic setup lmao
+# feel free to change this - AzuriDayo
+
 services:
   bayshore:
-    image: ${BAYSHORE_IMAGE:-ghcr.io/projectasakura/bayshore:latest}
+    # This defaults to using ProjectAsakura's bayshore image if not overridden from .env
+    image: ${OVERRIDE_BAYSHORE_IMAGE:-ghcr.io/projectasakura/bayshore:latest}
     ports:
       - 80:80
       - 10082:10082
@@ -9,8 +14,8 @@ services:
     env_file: .env
     volumes:
       - ./config.json:/home/node/config.json
-    init: true
-  db:
+    init: true # <- Ya fuck nodejs this is required to make it work well
+  postgres:
     image: docker.io/postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -18,7 +23,7 @@ services:
       POSTGRES_PASSWORD: bayshore
       POSTGRES_DB: bayshore
     ports:
-      - 6432:5432
+      - 5432:5432
     volumes:
       - bayshore_data:/var/lib/postgresql/data
       - ./sql-files:/root/sql-files
