@@ -1,21 +1,16 @@
 diff --git a/src/modules/cars.ts b/src/modules/cars.ts
-index ab2634d..98a3067 100644
+index ab2634d..9306cf3 100644
 --- a/src/modules/cars.ts
 +++ b/src/modules/cars.ts
-@@ -158,6 +158,16 @@ export default class CarModule {
- 				}
- 			});
+@@ -131,6 +131,11 @@ export default class CarModule {
+ 				return;
+ 			}
  
-+			// Add azuri personal items
-+			for (const data of ([
-+				{ carId: car.carId, amount: 1, category: 16, itemId: 1 }, // bgm mt3
-+				{ carId: car.carId, amount: 1, category: 15, itemId: 2 }, // odometer yellow racing
-+			])) {
-+				await prisma.carItem.create({
-+					data,
-+				})
-+			}
++			(additionalInsert as any).items = [
++				{ amount: 1, category: 16, itemId: 1 }, // bgm mt3
++				{ amount: 1, category: 15, itemId: 2 }, // odometer yellow racing
++			];
 +
- 			// Check if created car is from terminal scratch car
- 			await terminal.checkScratchCar(body.userId, body.car.visualModel!)
- 
+ 			// Generate blank car settings object
+ 			let settings = await prisma.carSettings.create({
+ 				data: {}
