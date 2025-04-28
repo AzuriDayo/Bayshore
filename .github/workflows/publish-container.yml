@@ -35,12 +35,24 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
       - name: Build image
         run: |
+          pnpm i --frozen-lockfile
+          # Remove this when submiting PRs in other repos
+          if [ -e ./personal-patches/apply-patches.mjs ]; then ./personal-patches/apply-patches.mjs; fi
+          pnpm run build
+          export PRISMA_VERSION=$(yq '.importers["."].devDependencies.prisma.version' -r <pnpm-lock.yaml)
+
           # First, lowercase-ify owner
           export owner=${{ github.repository_owner }}
           export owner=${owner,,}
           docker buildx build \
+            --build-arg PRISMA_VERSION="$PRISMA_VERSION"
             --platform linux/${{ matrix.build-targets.arch }} \
             --push \
             -t "ghcr.io/${owner}/bayshore:${{ matrix.build-targets.manifest-name }}-${{ github.sha }}" \

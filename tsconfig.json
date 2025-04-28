@@ -1,15 +1,22 @@
 {
     "compilerOptions": {
         "sourceMap": true,
-        "outDir": "dist",
         "strict": true,
-        "lib": ["esnext"],
+        "lib": [
+            "esnext"
+        ],
         "esModuleInterop": true,
         "allowJs": true,
-        "types":[
+        "types": [
             "long"
-        ]
+        ],
+        "noEmit": true,
     },
-    "include": ["src/**/*"],
-    "exclude": ["src/wmmt/**/*"]
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.js",
+    ],
+    "exclude": [
+        "src/wmmt/*.proto.d.ts"
+    ]
 }

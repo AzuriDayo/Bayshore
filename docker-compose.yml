@@ -5,7 +5,11 @@
 services:
   bayshore:
     # This defaults to using ProjectAsakura's bayshore image if not overridden from .env
-    image: ${OVERRIDE_BAYSHORE_IMAGE:-ghcr.io/projectasakura/bayshore:latest}
+    # image: ${OVERRIDE_BAYSHORE_IMAGE:-ghcr.io/projectasakura/bayshore:latest}
+    build:
+      context: .
+      args:
+        - PRISMA_VERSION=4.16.2
     ports:
       - 80:80
       - 10082:10082

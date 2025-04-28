@@ -112,24 +112,32 @@ allnetApp.use((req, res, next) => {
     next()
 });
 
-// Get all of the files in the modules directory
-let dirs = fs.readdirSync(path.join(path.dirname(__filename), 'modules'));
-// Loop over the files
-for (let i of dirs) 
-{
-    // If the file is a .js file
-    if (i.endsWith('.js') || i.endsWith('.ts')) // if running directly from ts files 
-    {
-        // Require the module file
-        let mod = require(`./modules/${i.substring(0, i.length - 3)}`);
+import cars from "./modules/cars"
+import game from "./modules/game"
+import ghost_ocm from "./modules/ghost_ocm"
+import ghost from "./modules/ghost"
+import resource from "./modules/resource"
+import startup from "./modules/startup"
+import terminal from "./modules/terminal"
+import time_attack from "./modules/time_attack"
+import users from "./modules/users"
 
-        // Create an instance of the module
-        let inst = new mod.default();
-
-        // Register the module with the app
-        inst.register(appRouter);
-    }
-}
+// Create an instance of the module
+for (const mod of [
+    cars,
+    game,
+    ghost,
+    ghost_ocm,
+    resource,
+    startup,
+    terminal,
+    terminal,
+    time_attack,
+    users,
+  ]) {
+    // Register the module with the app
+    new mod().register(appRouter as any);
+  }
 
 // Host on / and /wmmt6/ path
 app.use('/', appRouter);

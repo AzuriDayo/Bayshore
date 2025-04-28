@@ -13,3 +13,4 @@ screenshot/*
 yarn.lock
 overrides.yml
 /sql-files
+/index.js
