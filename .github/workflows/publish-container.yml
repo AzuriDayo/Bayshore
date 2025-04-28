@@ -53,7 +53,7 @@ jobs:
           export owner=${{ github.repository_owner }}
           export owner=${owner,,}
           docker buildx build \
-            --build-arg PRISMA_VERSION="$PRISMA_VERSION"
+            --build-arg PRISMA_VERSION="$PRISMA_VERSION" \
             --platform linux/${{ matrix.build-targets.arch }} \
             --push \
             -t "ghcr.io/${owner}/bayshore:${{ matrix.build-targets.manifest-name }}-${{ github.sha }}" \
