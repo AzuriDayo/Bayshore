@@ -8,7 +8,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "tsc && esbuild --bundle --format=cjs --platform=node --keep-names --outfile=index.js --external:@prisma/client --external:prisma ./src/index.ts && prisma generate",
+    "build": "prisma generate && tsc && esbuild --bundle --format=cjs --platform=node --keep-names --outfile=index.js --external:@prisma/client --external:prisma ./src/index.ts",
     "prisma-generate": "prisma generate"
   },
   "devDependencies": {
