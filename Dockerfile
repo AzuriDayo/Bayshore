@@ -1,5 +1,6 @@
 FROM node:18-alpine AS base
 FROM base AS builder
+RUN apk add --no-cache git
 
 WORKDIR /server
 
@@ -9,6 +10,10 @@ COPY src ./src
 COPY prisma ./prisma
 
 RUN npm ci
+
+# Apply personal patches
+COPY personal-patches ./personal-patches
+RUN ./personal-patches/apply-patches.mjs
 
 # Compile the application source code
 RUN npm run build
