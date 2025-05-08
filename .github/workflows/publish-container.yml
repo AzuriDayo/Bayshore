@@ -2,7 +2,7 @@ name: Publish container
 
 on:
   push:
-    branches: [master]
+    branches: [master, master-custom]
   workflow_dispatch:
 
 defaults:
@@ -38,14 +38,20 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.node-version'
-          cache: 'pnpm'
-          cache-dependency-path: 'pnpm-lock.yaml'
+          node-version-file: ".node-version"
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
       - name: Build image
         run: |
+          if [ "${GITHUB_REF//'refs/heads/'}" = "master" ]; then
+            export tag="latest"
+          elif [ "${GITHUB_REF//'refs/heads/'}" = "master-custom" ]; then
+            export tag="latest-custom"
+          else
+            echo "::error::No tag found"
+          fi
+
           pnpm i --frozen-lockfile
-          # Remove this when submiting PRs in other repos
-          if [ -e ./personal-patches/apply-patches.mjs ]; then ./personal-patches/apply-patches.mjs; fi
           pnpm run build
           export PRISMA_VERSION=$(yq '.importers["."].devDependencies.prisma.version' -r <pnpm-lock.yaml)
 
@@ -57,7 +63,7 @@ jobs:
             --platform linux/${{ matrix.build-targets.arch }} \
             --push \
             -t "ghcr.io/${owner}/bayshore:${{ matrix.build-targets.manifest-name }}-${{ github.sha }}" \
-            -t "ghcr.io/${owner}/bayshore:${{ matrix.build-targets.manifest-name }}-latest" \
+            -t "ghcr.io/${owner}/bayshore:${{ matrix.build-targets.manifest-name }}-${tag}" \
             --provenance false \
             .
   merge-container:
@@ -78,10 +84,19 @@ jobs:
           # First, lowercase-ify owner
           export owner=${{ github.repository_owner }}
           export owner=${owner,,}
-          docker manifest create "ghcr.io/${owner}/bayshore:latest" \
+
+          if [ "${GITHUB_REF//'refs/heads/'}" = "master" ]; then
+            export tag="latest"
+          elif [ "${GITHUB_REF//'refs/heads/'}" = "master-custom" ]; then
+            export tag="latest-custom"
+          else
+            echo "::error::No tag found"
+          fi
+
+          docker manifest create "ghcr.io/${owner}/bayshore:${tag}" \
             --amend "ghcr.io/${owner}/bayshore:arm64-${{ github.sha }}" \
             --amend "ghcr.io/${owner}/bayshore:x64-${{ github.sha }}"
-          docker manifest push "ghcr.io/${owner}/bayshore:latest"
+          docker manifest push "ghcr.io/${owner}/bayshore:${tag}"
 
           docker manifest create "ghcr.io/${owner}/bayshore:${{ github.sha }}" \
             --amend "ghcr.io/${owner}/bayshore:arm64-${{ github.sha }}" \
