@@ -410,6 +410,13 @@ export async function createCar(body: wm.protobuf.CreateCarRequest)
     let pickRandom = Math.floor(Math.random() * randomArray.length);
     random = randomArray[pickRandom];
 
+    // Force the car to be fully tuned
+    if (body.car && body.car.tunePower + body.car.tuneHandling <= 24) {
+        body.car.tunePower = 17
+        body.car.tuneHandling = 17
+        tune = 2
+    }
+
     // Default car values
     let carInsert = {
         userId: user.id,

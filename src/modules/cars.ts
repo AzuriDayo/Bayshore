@@ -131,6 +131,11 @@ export default class CarModule {
 				return;
 			}
 
+			(additionalInsert as any).items = [
+				{ amount: 1, category: 16, itemId: 1 }, // bgm mt3
+				{ amount: 1, category: 15, itemId: 2 }, // odometer yellow racing
+			];
+
 			// Generate blank car settings object
 			let settings = await prisma.carSettings.create({
 				data: {}
